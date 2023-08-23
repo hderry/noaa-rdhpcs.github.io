@@ -246,9 +246,10 @@ Compute Nodes
 Each C5 compute node consists of [2x] 64-core AMD Rome EPYC Rome "Zen 2" 7H12 CPUs (with 2 hardware threads per physical core) with access to 251 GB of DDR4 memory. The nodes are dual socket systems with eight memory channels per socket. AMD has technology known as Simultaneous Multithreading, similar to Intel's Hyper-Threading technology, which doubles the number of logical CPUs on a node allowing for 256 logical cores. 
 
 The compute nodes are configured in high-bandwidth mode in order to minimize local memory latency for NUMA-aware or highly parallelizable workloads by defining multiple NUMA zones per socket.
-* 4 memory "NUMANodes" per socket
-* Allocates memory channels to core groups 
-* 16 cores per memory "node"
+
+- 4 memory "NUMANodes" per socket
+- Allocates memory channels to core groups 
+- 16 cores per memory "node"
 
 Applications runnnig with OpenMP are supported and run well on C5. On C3 and C4 clusters, OpenMP appplications have been able to utilize HyperThreads for a slight performance benefit. 
 
@@ -317,7 +318,7 @@ Modules and Software
 
 LMOD
 ----
-LMOD is the modules software management system used on C5 and the C5 login nodes. Unlike the module system on C3/C4, LMOD employs a hierarchical system that, when used properly, considers dependencies and prerequisites for a given software package. For example, the **cray-netcdf** module depends on the **cray-hdf5** module and cannot be seen by the standard **module avail** commands nor be loaded until the **cray-hdf5** module is loaded. 
+LMOD is the modules software management system used on C5 and the C5 login nodes. Unlike the module system on C3/C4, LMOD employs a hierarchical system that, when used properly, considers dependencies and prerequisites for a given software package. For example, the **cray-netcdf** module depends on the **cray-hdf5** module and cannot be seen by the standard ``module avail`` commands nor be loaded until the **cray-hdf5** module is loaded. 
 
 The LMOD hierarchical system will automatically deactivate or swap an upstream module dependency. Two examples are given below. Another feature of LMOD is swapping or unloading an upstream dependency. When that happens, any downstream module will still be loaded but inactivated.
 
@@ -381,9 +382,9 @@ You can use this path to restore files or subdirectories. The permissions will b
 Lustre Filesystems (F2)
 -----------------------
 
-F2 is a 33PB Lustre Filesystem. 
+F2 is a 33PB Lustre Filesystem. Certain limitations apply to F2. For instance, performance will start to degrade after utilization exceeds 80% on a filesystem. As a result, using well informed I/O, managing the quota, and using the lustre storage tools (``lfs) is important.
 
-User directories are available at 
+User directories are available at: 
 
 .. code-block:: shell
 
@@ -396,7 +397,7 @@ and
     lustre/f2/dev/$USER
 
 
-NCEP users' directories are found in 
+NCEP users' directories are available at:
 
 .. code-block:: shell
 
@@ -639,8 +640,8 @@ is static, while C5's default is dynamic.
 
 .. note::
 
-  Dynamic linking will create smaller executalbe.  However, the environment must
-  be identical when running the executalbe as was configured when building.
+  Dynamic linking will create smaller executable.  However, the environment must
+  be identical when running the executable as was configured when building.
   Static binaries are larger, but do not require the build and runtime
   environments to be identical.
 
@@ -696,13 +697,13 @@ Slurm
 
 Gaea uses a batch scheduling system known as SchedMD’s Slurm Workload Manager for scheduling and managing jobs. Users can run programs by submitting scripts to the Slurm job scheduler. 
 
-A Slurm script must do the following:
+A run script must do the following:
 
-1. set the environment
-2. prescribe the resource requirements for the job
-3. specify the work to be carried out in the form of shell commands
+1. Set the environment
+2. Prescribe the resource requirements for the job
+3. Specify the work to be carried out in the form of shell commands
 
-Some common slurm commands are summarized in the table below. 
+Some common Slurm commands are summarized in the table below.
 
 Login v. Compute Nodes
 ----------------------
@@ -768,7 +769,7 @@ Interactive jobs can be used for developing, testing, modifying, or debugging co
 
 .. code-block:: shell
 
-    $ salloc
+    $ salloc [options] [ [args...]] 
 
 When you run the salloc command, you won't get a prompt back until the batch system scheduler is able to run the job. Once that happens, the scheduler will drop you into a login session on the head node allocated to your interactive job. At this point, you will have a prompt and may run commands in this shell as needed. 
 
@@ -779,12 +780,21 @@ Batch Script Example
 .. code-block:: shell
 
     #!/bin/bash
-
+    
+    # -- Request 16 core
     #SBATCH --ntasks=16
+    #
+    # -- Specify a maximum wallclock of 4 hours
     #SBATCH --time=4:00:00
+    #
+    # -- Specify under which account a job should run
     #SBATCH --account=gfdl_x
+    #
+    # -- Set the name of the job, or Slurm will default to the name of the script
     #SBATCH --job-name=xyz
-    #SBATCH --chdir=
+    #
+    # -- Tell the batch system to set the working directory 
+    #SBATCH --chdir=/some/path
 
     nt=$SLURM_NTASKS
     module load intel <version>
@@ -810,13 +820,16 @@ There are two ways to specify sbatch options. The first is on the command line w
 
 .. code-block:: shell
 
-    $ salloc
+    $ sbatch --cluster=c5 --account=abc123 runscript.sh
 
 The second method is to insert directives at the top of the batch script using #SBATCH syntax. For example, 
 
 .. code-block:: shell
 
-    $ salloc
+    #!/bin/bash
+    #SBATCH --clusters=c5
+    #SBATCH --account=abc123
+    
 
 The two methods can be mixed together. However, options specified on the command line always override options specified in the script. 
 
@@ -872,7 +885,7 @@ Slurm Environment Variables
 |                          |                                                                                  |
 +--------------------------+----------------------------------------------------------------------------------+
 | $SLURM_JOBID             | The job's full identifier. A common use for $SLURM_JOBID is to append the job's  |
-                           |  ID to the standard output and error files.                                      |
+|                          |  ID to the standard output and error files.                                      |
 +--------------------------+----------------------------------------------------------------------------------+
 | $SLURM_JOB_NUM_NODES     | The number of nodes requested.                                                   |
 +--------------------------+----------------------------------------------------------------------------------+
@@ -997,7 +1010,7 @@ Arm DDT is a powerful, easy-to-use graphical debugger. With Arm DDT it is possib
 
 Arm DDT supports:
 
--C, C++, and all derivatives of Fotran, including Fortran 90,
+- C, C++, and all derivatives of Fotran, including Fortran 90,
 - Limited support for Python (CPython 2.7)
 - Parallel languages/models including MPI, UPCm and fortran 2008 Co-arrays. 
 - GPU languages such as HMPP, OpenMP Accelerators, CUDA and CUDA Fortran. 
@@ -1005,8 +1018,6 @@ Arm DDT supports:
 Arm DDT helps you to find and fix problems on a single thread or across hundreds of thousands of threads. It includes static analysis to highlight potential code problems, integrated memory debugging to identify reads and writes that are outside of array bounds, and integration with MPI message queues. 
 
 In addition to traditional debugging features, DDT also supports attaching to already-running processes and offline (non-interactive) debugging for long running jobs. 
-
-For guidance on using DDT on gaea see the xyz page. 
 
 
 Optimizing and Profiling
@@ -1019,6 +1030,7 @@ Known Module Incompatibility on C5
 ----------------------------------
 
 There is a known incompatibility with the cray-libsci module and the following intel modules: 
+
 - intel-classic/2022.0.2
 - intel-oneapi/2022.0.2
 
