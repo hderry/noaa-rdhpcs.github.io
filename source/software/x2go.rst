@@ -3,6 +3,7 @@
 X2Go Remote Desktop
 ===================
 
+
 `X2Go <https://wiki.x2go.org/doku.php>`_ is an open source, `remote desktop
 <https://en.wikipedia.org/wiki/Remote_desktop>`__ solution designed to work
 well over low and high bandwidth connections.

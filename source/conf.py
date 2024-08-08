@@ -35,8 +35,7 @@ html_theme = "sphinx_rtd_theme"
 html_baseurl = "https://docs.rdhpcs.noaa.gov/"
 
 html_static_path = ["_static"]
-html_extra_path = ["_search/google64634d0922861b1a.html",
-                   "_search/robots.txt"]
+html_extra_path = ["_search/google64634d0922861b1a.html"]
 
 html_css_files = [
     "css/theme_overrides.css",
@@ -104,7 +103,9 @@ linkcheck_ignore = [
     r'https://www\.intel\.com/content/.*',
     r'https://www\.lustre\.org/documentation/',
     r'https://www\.putty\.org/*',
+    r'https://(orion|hercules)-ood.hpc.msstate.edu/?.*',
 ]
+linkcheck_retries = 3
 
 # This is needed for backwards compatibility.  We have
 # several links that point to pages that require a user
